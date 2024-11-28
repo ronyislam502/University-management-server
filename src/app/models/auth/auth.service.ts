@@ -6,6 +6,7 @@ import { createToken } from "./auth.utils";
 import config from "../../config";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { sendEmail } from "../../utilities/sendEmail";
 
 const loginUserFromDB = async (payload: TLoginUser) => {
   const user = await User.isUserExistsByCustomId(payload?.id);
@@ -171,7 +172,9 @@ const forgetPasswordFromDB = async (userId: string) => {
     "10m"
   );
 
-  const resetUrlLink = `?id=${user.id}&token=${resetToken}`;
+  const resetUrlLink = `${config.reset_password_url_link}?id=${user.id}&token=${resetToken}`;
+
+  sendEmail(user.email, resetUrlLink);
 
   return resetUrlLink;
 };

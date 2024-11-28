@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import notFound from "./app/middlewares/notFound";
@@ -13,11 +13,11 @@ app.use(cors({ origin: ["http://localhost:5173"] }));
 
 app.use("/api/v1", router);
 
-const getController = (req: Request, res: Response) => {
-  res.send("First Project");
-};
+// const getController = (req: Request, res: Response) => {
+//   res.send("First Project");
+// };
 
-app.get("/", getController);
+// app.get("/", getController);
 
 app.use(globalErrorHandler);
 app.use(notFound);
