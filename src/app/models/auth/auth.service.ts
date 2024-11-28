@@ -185,30 +185,25 @@ const resetPasswordFromDB = async (
 ) => {
   // checking if the user is exist
   const user = await User.isUserExistsByCustomId(payload?.id);
-
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
+    throw new AppError(httpStatus.NOT_FOUND, "This user is not found");
   }
-  // checking if the user is already deleted
-  const isDeleted = user?.isDeleted;
+
+  const isDeleted = user.isDeleted;
 
   if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
+    throw new AppError(httpStatus.FORBIDDEN, "User is deleted");
   }
-
-  // checking if the user is blocked
-  const userStatus = user?.status;
+  const userStatus = user.status;
 
   if (userStatus === "blocked") {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
+    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked");
   }
 
   const decoded = jwt.verify(
     token,
     config.jwt_access_secret as string
   ) as JwtPayload;
-
-  //localhost:3000?id=A-0001&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
 
   if (payload.id !== decoded.userId) {
     // console.log(payload.id, decoded.userId);
