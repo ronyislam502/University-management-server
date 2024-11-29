@@ -20,8 +20,13 @@ import { Faculty } from "../faculty/faculty.model";
 import { TAdmin } from "../admin/admin.interface";
 import { Admin } from "../admin/admin.model";
 import { USER_ROLE } from "./user.const";
+import { sendImageToCloudinary } from "../../utilities/sendImageToCloudinary";
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+  file: any,
+  password: string,
+  payload: TStudent
+) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -48,6 +53,12 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //set  generated id
     userData.id = await generateStudentId(admissionSemester);
 
+    // cloudinary
+    const imageName = `${userData.id}${payload?.name?.firstName}`;
+
+    const path = file?.path;
+
+    const { secure_url }: any = await sendImageToCloudinary(imageName, path);
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
 
@@ -55,9 +66,10 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create user");
     }
-    // set id , _id as user
+    // set id , url_id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
+    payload.profileImg = secure_url;
 
     // create a student (transaction-2)
 

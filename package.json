@@ -21,6 +21,7 @@
     "@types/cookie-parser": "^1.4.8",
     "@types/jsonwebtoken": "^9.0.7",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "D": "^1.0.0",
@@ -28,6 +29,7 @@
     "express": "^4.19.2",
     "http-status": "^1.7.4",
     "mongoose": "^8.3.5",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
     "zod": "^3.24.0-canary.20240701T200529"
   },
@@ -37,6 +39,7 @@
     "@types/cors": "^2.8.17",
     "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
     "@types/node": "^20.12.12",
     "@types/nodemailer": "^6.4.17",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
