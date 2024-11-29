@@ -39,8 +39,21 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const changeStatus = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await UserServices.changeStatusFromDB(id, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "user status updated successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createStudent,
   createAdmin,
   createFaculty,
+  changeStatus,
 };

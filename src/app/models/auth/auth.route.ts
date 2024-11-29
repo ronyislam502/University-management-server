@@ -37,4 +37,10 @@ router.post(
   AuthControllers.resetPassword
 );
 
+router.get(
+  "/me",
+  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  AuthControllers.getMe
+);
+
 export const AuthRoutes = router;

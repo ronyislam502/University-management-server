@@ -7,6 +7,10 @@ import config from "../../config";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../../utilities/sendEmail";
+import { USER_ROLE } from "../user/user.const";
+import { Student } from "../student/student.model";
+import { Faculty } from "../faculty/faculty.model";
+import { Admin } from "../admin/admin.model";
 
 const loginUserFromDB = async (payload: TLoginUser) => {
   const user = await User.isUserExistsByCustomId(payload?.id);
@@ -229,10 +233,29 @@ const resetPasswordFromDB = async (
   );
 };
 
+const getMeFromDB = async (userId: string, role: string) => {
+  let result = null;
+  if (role === USER_ROLE.student) {
+    result = await Student.findOne({ id: userId }).populate("user");
+  }
+  if (role === USER_ROLE.faculty) {
+    result = await Faculty.findOne({ id: userId }).populate("user");
+  }
+  if (role === USER_ROLE.admin) {
+    result = await Admin.findOne({ id: userId }).populate("user");
+  }
+
+  return result;
+};
+
+const changeStatusFromDB = async () => {};
+
 export const AuthServices = {
   loginUserFromDB,
   changePasswordFromDB,
   refreshTokenFromDB,
   forgetPasswordFromDB,
   resetPasswordFromDB,
+  getMeFromDB,
+  changeStatusFromDB,
 };
