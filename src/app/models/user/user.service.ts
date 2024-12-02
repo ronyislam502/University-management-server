@@ -58,7 +58,8 @@ const createStudentIntoDB = async (
 
     const path = file?.path;
 
-    const { secure_url }: any = await sendImageToCloudinary(imageName, path);
+    const img_url = await sendImageToCloudinary(imageName, path);
+
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
 
@@ -69,7 +70,7 @@ const createStudentIntoDB = async (
     // set id , url_id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = secure_url;
+    payload.profileImg = img_url;
 
     // create a student (transaction-2)
 
@@ -82,6 +83,7 @@ const createStudentIntoDB = async (
     await session.commitTransaction();
     await session.endSession();
 
+    // return null;
     return newStudent;
   } catch (err: any) {
     await session.abortTransaction();

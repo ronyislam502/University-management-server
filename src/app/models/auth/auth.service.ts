@@ -248,8 +248,6 @@ const getMeFromDB = async (userId: string, role: string) => {
   return result;
 };
 
-const changeStatusFromDB = async () => {};
-
 export const AuthServices = {
   loginUserFromDB,
   changePasswordFromDB,
@@ -257,5 +255,4 @@ export const AuthServices = {
   forgetPasswordFromDB,
   resetPasswordFromDB,
   getMeFromDB,
-  changeStatusFromDB,
 };

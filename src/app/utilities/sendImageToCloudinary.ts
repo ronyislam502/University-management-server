@@ -11,40 +11,42 @@ export const sendImageToCloudinary = async (
     api_secret: "z4FYfmE3cYrnMxgG3W442XXJ0cw",
   });
 
-  // Upload an image
-  const uploadResult = await cloudinary.uploader
-    .upload(path, {
-      public_id: imageName,
-    })
-    .catch((error) => {
-      console.log(error);
-      //   delete uploads file data
+  console.log(imageName, path);
 
+  // Upload an image
+  const result = await cloudinary.uploader.upload(
+    path,
+    { public_id: imageName.trim() },
+    function () {
+      // delete a file asynchronously
       fs.unlink(path, (err) => {
         if (err) {
-          console.error(err);
+          console.log(err);
         } else {
-          console.log("file is Deleted");
+          console.log("File is deleted.");
         }
       });
-    });
-  console.log(uploadResult);
+    }
+  );
 
-  // Optimize delivery by resizing and applying auto-format and auto-quality
-  const optimizeUrl = cloudinary.url(imageName, {
-    fetch_format: "auto",
-    quality: "auto",
-  });
+  console.log("image", result.secure_url);
+  return result.secure_url;
 
-  console.log(optimizeUrl);
+  // // Optimize delivery by resizing and applying auto-format and auto-quality
+  // const optimizeUrl = cloudinary.url(imageName, {
+  //   fetch_format: "auto",
+  //   quality: "auto",
+  // });
 
-  // Transform the image: auto-crop to square aspect_ratio
-  const autoCropUrl = cloudinary.url(imageName, {
-    crop: "auto",
-    gravity: "auto",
-    width: 500,
-    height: 500,
-  });
+  // console.log("optimize-url", optimizeUrl);
 
-  console.log(autoCropUrl);
+  // // Transform the image: auto-crop to square aspect_ratio
+  // const autoCropUrl = cloudinary.url(imageName, {
+  //   crop: "auto",
+  //   gravity: "auto",
+  //   width: 500,
+  //   height: 500,
+  // });
+
+  // console.log("auto-crop-url", autoCropUrl);
 };

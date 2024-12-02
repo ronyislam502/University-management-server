@@ -9,10 +9,16 @@ import { FacultyRoutes } from "../models/faculty/faculty.route";
 import { CourseRoutes } from "../models/course/course.route";
 import { SemesterRegistrationRoutes } from "../models/semesterRegistration/registration.route";
 import { OfferedCourseRoutes } from "../models/courseOffered/offeredCourse.route";
+import { AuthRoutes } from "../models/auth/auth.route";
+import { EnrolledCoursesRoutes } from "../models/enrolledCourses/enrolledCourses.route";
 
 const router = Router();
 
 const moduleRoutes = [
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
   {
     path: "/users",
     route: UserRoutes,
@@ -52,6 +58,10 @@ const moduleRoutes = [
   {
     path: "/offeredCourses",
     route: OfferedCourseRoutes,
+  },
+  {
+    path: "/enrolledCourses",
+    route: EnrolledCoursesRoutes,
   },
 ];
 

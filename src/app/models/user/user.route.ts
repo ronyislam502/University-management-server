@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post(
   "/create-user",
-  auth(USER_ROLE.admin),
+  // auth(USER_ROLE.admin),
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);

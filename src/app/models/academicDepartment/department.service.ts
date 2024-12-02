@@ -1,8 +1,23 @@
+import httpStatus from "http-status";
+import { AcademicFaculty } from "../academicFaculty/faculty.model";
 import { TDepartment } from "./department.interface";
 import { AcademicDepartment } from "./department.model";
+import AppError from "../../errors/AppError";
 
 const createDepartmentIntoDB = async (payload: TDepartment) => {
-  const result = await AcademicDepartment.create(payload);
+  const isExistsAcademicFaculty = await AcademicFaculty.findById(
+    payload.academicFaculty
+  );
+
+  if (!isExistsAcademicFaculty) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "This Academic Faculty is not found"
+    );
+  }
+  const result = (await AcademicDepartment.create(payload)).populate(
+    "academicFaculty"
+  );
   return result;
 };
 
