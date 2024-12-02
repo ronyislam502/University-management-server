@@ -3,6 +3,8 @@ import { AcademicFaculty } from "../academicFaculty/faculty.model";
 import { TDepartment } from "./department.interface";
 import { AcademicDepartment } from "./department.model";
 import AppError from "../../errors/AppError";
+import QueryBuilder from "../../builder/queryBuilder";
+import { AcademicDepartmentSearchableFields } from "./department.const";
 
 const createDepartmentIntoDB = async (payload: TDepartment) => {
   const isExistsAcademicFaculty = await AcademicFaculty.findById(
@@ -21,9 +23,24 @@ const createDepartmentIntoDB = async (payload: TDepartment) => {
   return result;
 };
 
-const getAllDepartmentsFromDB = async () => {
-  const result = await AcademicDepartment.find().populate("academicFaculty");
-  return result;
+const getAllDepartmentsFromDB = async (query: Record<string, unknown>) => {
+  const academicDepartmentQuery = new QueryBuilder(
+    AcademicDepartment.find().populate("academicFaculty"),
+    query
+  )
+    .search(AcademicDepartmentSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await academicDepartmentQuery.modelQuery;
+  const meta = await academicDepartmentQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleDepartmentFromDB = async (_id: string) => {

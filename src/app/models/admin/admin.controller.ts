@@ -10,7 +10,8 @@ const getAllAdmin = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "All Admin is getting successfully",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

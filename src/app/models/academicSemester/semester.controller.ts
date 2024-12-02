@@ -16,13 +16,14 @@ const createSemester = catchAsync(async (req, res) => {
 });
 
 const getAllSemesters = catchAsync(async (req, res) => {
-  const result = await SemesterServices.getAllSemesterFromDB();
+  const result = await SemesterServices.getAllSemesterFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Academic Semester are retrieved successfully",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

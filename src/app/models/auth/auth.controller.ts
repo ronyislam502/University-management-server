@@ -75,23 +75,10 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 
-const getMe = catchAsync(async (req, res) => {
-  const { userId, role } = req.user;
-  const result = await AuthServices.getMeFromDB(userId, role);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "user retrieved successfully!",
-    data: result,
-  });
-});
-
 export const AuthControllers = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
   resetPassword,
-  getMe,
 };

@@ -1,3 +1,5 @@
 .env
 dist
 node_modules
+
+git remote add origin https://github.com/ronyislam502/University-management-server.git
