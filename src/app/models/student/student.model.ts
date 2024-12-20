@@ -141,6 +141,7 @@ const StudentSchema = new Schema<TStudent, StudentModel>(
     },
     profileImg: {
       type: String,
+      default: "",
     },
     admissionSemester: {
       type: Schema.Types.ObjectId,

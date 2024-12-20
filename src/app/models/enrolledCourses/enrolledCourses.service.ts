@@ -2,7 +2,6 @@
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { OfferedCourse } from "../courseOffered/offeredCourse.model";
-import { TEnrolledCourse } from "./enrolledCourses.interface";
 import { Student } from "../student/student.model";
 import EnrolledCourse from "./enrolledCourses.model";
 import { Course } from "../course/course.model";
@@ -11,38 +10,47 @@ import mongoose from "mongoose";
 import { Faculty } from "../faculty/faculty.model";
 import { calculateGradeAndPoints } from "./enrolledCourses.utils";
 import QueryBuilder from "../../builder/queryBuilder";
+import { TEnrolledCourse } from "./enrolledCourses.interface";
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
   payload: TEnrolledCourse
 ) => {
-  const isOfferedCourseExists = await OfferedCourse.findById(
-    payload.offeredCourse
-  );
+  /**
+   * Step1: Check if the offered cousres is exists
+   * Step2: Check if the student is already enrolled
+   * Step3: Check if the max credits exceed
+   * Step4: Create an enrolled course
+   */
+
+  const { offeredCourse } = payload;
+
+  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
 
   if (!isOfferedCourseExists) {
-    throw new AppError(httpStatus.NOT_FOUND, "Offered course not found");
+    throw new AppError(httpStatus.NOT_FOUND, "Offered course not found !");
   }
+
   if (isOfferedCourseExists.maxCapacity <= 0) {
-    throw new AppError(httpStatus.BAD_GATEWAY, "Room is full");
+    throw new AppError(httpStatus.BAD_GATEWAY, "Room is full !");
   }
 
   const student = await Student.findOne({ id: userId }, { _id: 1 });
 
-  if (student) {
-    throw new AppError(httpStatus.NOT_FOUND, "Student not Found");
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, "Student not found !");
   }
-
   const isStudentAlreadyEnrolled = await EnrolledCourse.findOne({
     semesterRegistration: isOfferedCourseExists?.semesterRegistration,
-    offeredCourse: payload.offeredCourse,
-    student: student,
+    offeredCourse,
+    student: student._id,
   });
 
   if (isStudentAlreadyEnrolled) {
-    throw new AppError(httpStatus.CONFLICT, "Student is already enrolled");
+    throw new AppError(httpStatus.CONFLICT, "Student is already enrolled !");
   }
 
+  // check total credits exceeds maxCredit
   const course = await Course.findById(isOfferedCourseExists.course);
   const currentCredit = course?.credits;
 
@@ -56,15 +64,15 @@ const createEnrolledCourseIntoDB = async (
     {
       $match: {
         semesterRegistration: isOfferedCourseExists.semesterRegistration,
-        student: student,
+        student: student._id,
       },
     },
     {
       $lookup: {
-        from: "course",
+        from: "courses",
         localField: "course",
         foreignField: "_id",
-        as: "enrolledCourses",
+        as: "enrolledCourseData",
       },
     },
     {
@@ -73,9 +81,7 @@ const createEnrolledCourseIntoDB = async (
     {
       $group: {
         _id: null,
-        totalEnrolledCredits: {
-          $sum: "$enrolledCourseData.credits",
-        },
+        totalEnrolledCredits: { $sum: "$enrolledCourseData.credits" },
       },
     },
     {
@@ -86,13 +92,14 @@ const createEnrolledCourseIntoDB = async (
     },
   ]);
 
+  //  total enrolled credits + new enrolled course credit > maxCredit
   const totalCredits =
     enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
 
   if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "You have exceeded maximum number of credits"
+      "You have exceeded maximum number of credits !"
     );
   }
 
@@ -101,29 +108,32 @@ const createEnrolledCourseIntoDB = async (
   try {
     session.startTransaction();
 
-    const payloadData = {
-      semesterRegistration: isOfferedCourseExists.semesterRegistration,
-      academicSemester: isOfferedCourseExists.academicSemester,
-      academicFaculty: isOfferedCourseExists.academicFaculty,
-      academicDepartment: isOfferedCourseExists.academicDepartment,
-      offeredCourse: payload.offeredCourse,
-      course: isOfferedCourseExists.course,
-      student: student,
-      faculty: isOfferedCourseExists.faculty,
-      isEnrolled: true,
-    };
-
-    const result = await EnrolledCourse.create([payloadData], { session });
+    const result = await EnrolledCourse.create(
+      [
+        {
+          semesterRegistration: isOfferedCourseExists.semesterRegistration,
+          academicSemester: isOfferedCourseExists.academicSemester,
+          academicFaculty: isOfferedCourseExists.academicFaculty,
+          academicDepartment: isOfferedCourseExists.academicDepartment,
+          offeredCourse: offeredCourse,
+          course: isOfferedCourseExists.course,
+          student: student._id,
+          faculty: isOfferedCourseExists.faculty,
+          isEnrolled: true,
+        },
+      ],
+      { session }
+    );
 
     if (!result) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "Failed to enrolled in this course"
+        "Failed to enroll in this course !"
       );
     }
 
     const maxCapacity = isOfferedCourseExists.maxCapacity;
-    await OfferedCourse.findByIdAndUpdate(OfferedCourse, {
+    await OfferedCourse.findByIdAndUpdate(offeredCourse, {
       maxCapacity: maxCapacity - 1,
     });
 

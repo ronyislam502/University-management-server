@@ -29,7 +29,6 @@ export const sendImageToCloudinary = async (
     }
   );
 
-  console.log("image", result.secure_url);
   return result.secure_url;
 
   // // Optimize delivery by resizing and applying auto-format and auto-quality

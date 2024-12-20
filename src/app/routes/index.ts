@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { UserRoutes } from "../models/user/user.route";
-import { StudentRouters } from "../models/student/student.route";
 import { SemesterRoutes } from "../models/academicSemester/semester.route";
 import { AcademicFacultyRoutes } from "../models/academicFaculty/faculty.route";
 import { DepartmentRoutes } from "../models/academicDepartment/department.route";
@@ -11,6 +10,7 @@ import { SemesterRegistrationRoutes } from "../models/semesterRegistration/regis
 import { OfferedCourseRoutes } from "../models/courseOffered/offeredCourse.route";
 import { AuthRoutes } from "../models/auth/auth.route";
 import { EnrolledCoursesRoutes } from "../models/enrolledCourses/enrolledCourses.route";
+import { StudentRoutes } from "../models/student/student.route";
 
 const router = Router();
 
@@ -25,7 +25,7 @@ const moduleRoutes = [
   },
   {
     path: "/students",
-    route: StudentRouters,
+    route: StudentRoutes,
   },
   {
     path: "/admins",

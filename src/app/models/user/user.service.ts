@@ -64,11 +64,14 @@ const createStudentIntoDB = async (
     userData.id = await generateStudentId(admissionSemester);
 
     // cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
 
-    const path = file?.path;
+      const path = file?.path;
 
-    const img_url = await sendImageToCloudinary(imageName, path);
+      const img_url = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = img_url as string;
+    }
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
@@ -80,7 +83,6 @@ const createStudentIntoDB = async (
     // set id , url_id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = img_url;
 
     // create a student (transaction-2)
 
@@ -110,7 +112,7 @@ const createFacultyIntoDB = async (
   // create a user object
   const userData: Partial<TUser> = {};
 
-  //if password is not given , use deafult password
+  //if password is not given , use default password
   userData.password = password || (config.default_password as string);
 
   //set student role
@@ -140,7 +142,7 @@ const createFacultyIntoDB = async (
       const path = file?.path;
       //send image to cloudinary
       const secure_url = await sendImageToCloudinary(imageName, path);
-      payload.profileImg = secure_url;
+      payload.profileImg = secure_url as string;
     }
 
     // create a user (transaction-1)
@@ -181,7 +183,7 @@ const createAdminIntoDB = async (
   // create a user object
   const userData: Partial<TUser> = {};
 
-  //if password is not given , use deafult password
+  //if password is not given , use default password
   userData.password = password || (config.default_password as string);
 
   //set student role
@@ -211,7 +213,7 @@ const createAdminIntoDB = async (
       const path = file?.path;
       //send image to cloudinary
       const secure_url = await sendImageToCloudinary(imageName, path);
-      payload.profileImg = secure_url;
+      payload.profileImg = secure_url as string;
     }
 
     // create a admin (transaction-2)
